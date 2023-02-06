@@ -183,6 +183,8 @@ function AccountLogin_OnLoad()
   this:SetSequence(0);
   this:SetCamera(0);
 
+  TOSFrame.noticeType = "EULA";
+
   this:RegisterEvent("SHOW_SERVER_ALERT");
   this:RegisterEvent("SHOW_SURVEY_NOTIFICATION");
 
@@ -207,8 +209,9 @@ end
 function AccountLogin_OnShow()
   CurrentGlueMusic = "Sound\\Music\\GlueScreenMusic\\wow_main_theme.mp3";
 
-  AcceptTOS();
-  AcceptEULA();
+  -- Try to show the EULA or the TOS
+  AccountLogin_ShowUserAgreements();
+
   local serverName = GetServerName();
   if (serverName) then
     AccountLoginRealmName:SetText(serverName);
@@ -274,29 +277,14 @@ function AccountLogin_Login()
   Autologin_OnLogin();
 end
 
-function AccountLogin_Turtle_Armory_Website()
+function AccountLogin_ManageAccount()
   PlaySound("gsLoginNewAccount");
-  LaunchURL(TURTLE_ARMORY_WEBSITE);
+  LaunchURL(AUTH_NO_TIME_URL);
 end
 
-function AccountLogin_Turtle_Website()
+function AccountLogin_LaunchCommunitySite()
   PlaySound("gsLoginNewAccount");
-  LaunchURL(AUTH_TURTLE_WEBSITE);
-end
-
-function AccountLogin_Turtle_Knowledge_Database()
-  PlaySound("gsLoginNewAccount");
-  LaunchURL(TURTLE_KNOWLEDGE_DATABASE_WEBSITE);
-end
-
-function AccountLogin_Turtle_Community_Forum()
-  PlaySound("gsLoginNewAccount");
-  LaunchURL(TURTLE_COMMUNITY_FORUM_WEBSITE);
-end
-
-function AccountLogin_Turtle_Discord()
-  PlaySound("gsLoginNewAccount");
-  LaunchURL(TURTLE_DISCORD_WEBSITE);
+  LaunchURL(COMMUNITY_URL);
 end
 
 function AccountLogin_Credits()
@@ -334,6 +322,68 @@ function AccountLogin_SurveyNotificationDone(accepted)
   SurveyNotificationDecline:Disable();
   SurveyNotificationDone(accepted);
   AccountLoginUI:Show();
+end
+
+function AccountLogin_ShowUserAgreements()
+  TOSScrollFrame:Hide();
+  EULAScrollFrame:Hide();
+  ScanningScrollFrame:Hide();
+  ContestScrollFrame:Hide();
+  TOSText:Hide();
+  EULAText:Hide();
+  ScanningText:Hide();
+  if (not EULAAccepted()) then
+    if (ShowEULANotice()) then
+      TOSNotice:SetText(EULA_NOTICE);
+      TOSNotice:Show();
+    end
+    AccountLoginUI:Hide();
+    TOSFrame.noticeType = "EULA";
+    TOSFrameTitle:SetText(EULA_FRAME_TITLE);
+    TOSFrameHeader:SetWidth(TOSFrameTitle:GetWidth() + 310);
+    EULAScrollFrame:Show();
+    EULAText:Show();
+    TOSFrame:Show();
+  elseif (not TOSAccepted()) then
+    if (ShowTOSNotice()) then
+      TOSNotice:SetText(TOS_NOTICE);
+      TOSNotice:Show();
+    end
+    AccountLoginUI:Hide();
+    TOSFrame.noticeType = "TOS";
+    TOSFrameTitle:SetText(TOS_FRAME_TITLE);
+    TOSFrameHeader:SetWidth(TOSFrameTitle:GetWidth() + 310);
+    TOSScrollFrame:Show();
+    TOSText:Show();
+    TOSFrame:Show();
+  elseif (not ScanningAccepted() and SHOW_SCANNING_AGREEMENT) then
+    if (ShowScanningNotice()) then
+      TOSNotice:SetText(SCANNING_NOTICE);
+      TOSNotice:Show();
+    end
+    AccountLoginUI:Hide();
+    TOSFrame.noticeType = "SCAN";
+    TOSFrameTitle:SetText(SCAN_FRAME_TITLE);
+    TOSFrameHeader:SetWidth(TOSFrameTitle:GetWidth() + 310);
+    ScanningScrollFrame:Show();
+    ScanningText:Show();
+    TOSFrame:Show();
+  elseif (not ContestAccepted() and SHOW_CONTEST_AGREEMENT) then
+    if (ShowContestNotice()) then
+      TOSNotice:SetText(CONTEST_NOTICE);
+      TOSNotice:Show();
+    end
+    AccountLoginUI:Hide();
+    TOSFrame.noticeType = "CONTEST";
+    TOSFrameTitle:SetText(CONTEST_FRAME_TITLE);
+    TOSFrameHeader:SetWidth(TOSFrameTitle:GetWidth() + 310);
+    ContestScrollFrame:Show();
+    ContestText:Show();
+    TOSFrame:Show();
+  else
+    AccountLoginUI:Show();
+    TOSFrame:Hide();
+  end
 end
 
 -- Virtual keypad functions
