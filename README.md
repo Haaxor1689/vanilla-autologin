@@ -18,6 +18,8 @@ Patch for Vanilla WoW client that adds auto login and account info saving featur
 
 Download the `Patch-Y.MPQ` and place the file inside `\Data` folder of your client.
 
+> **NOTE:** You need to have patched WoW.exe that allows glues patches.
+
 ## Advanced usage
 
 Account information is saved under `accountName` in your `\WTF\Config.wtf` file, unlike normal behavior, where it contains only the account name. When using this patch it will contain data in following format:
